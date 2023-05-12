@@ -2,16 +2,16 @@
 
 ## About the Project
 
-`partiql-rust-streams` is a proof-of-concept project to experiment reactive queries and data-flow query processing; using
+`partiql-rust-streams` is a proof-of-concept project to experiment reactive queries and data-flow query processing using
 PartiQL.
 
-_Note: This project includes code from [foobaz](https://github.com/zupzup/warp-websockets-exampl), which is licensed under the MIT license._
+_Note: This project includes code from [zupzup](https://github.com/zupzup/warp-websockets-exampl), which is licensed under the MIT license._
 
 ## Demo
 
 ### Create a computation and publish data to subscribed users
 
-First, we create a pub-sub model in which we define computations as PartiQL select-from-where queries and allow clients to register to the computations. With this, we allow publishing data targeting a Computation and pushing the results to clients over a WebSocket session. We use `partiql-lang-rust` for query evaluation. We lower the PartiQL query to a PartiQL Logical Plan during Computation creation.
+First, we create a pub-sub model in which we define computations as PartiQL select-from-where (SFW) queries and allow clients to register to the computations. With this, we allow publishing data, targeting a Computation and pushing the results to clients over a WebSocket session. We use `partiql-lang-rust` for query evaluation. We lower the PartiQL query to a PartiQL Logical Plan during Computation creation.
 
 ```
 # Define a computation
@@ -47,11 +47,11 @@ do
 done
 ```
 
-### Scale up data and use data-flow computation
+### Scale up the data and use data-flow computation
 
 Data-flow computation appears to be a good fit for processing streaming data; based on this observation, the idea is to be able to define a computation using PartiQL while being able to use the data-flow representation of the PartiQL query to process the streaming data—basically to create a Dataflow computation from a PartiQL Plan (the rewrite is not implemented in this project).
 
-For this demo we use [differential-dataflow](https://timelydataflow.github.io/differential-dataflow/introduction.html) to represent a simple computation (an SQL `COUNT` aggregate) for experimentation, about differential-dataflow from [GitHub](https://github.com/TimelyDataflow/differential-dataflow):
+For this demo we use [differential-dataflow](https://timelydataflow.github.io/differential-dataflow/introduction.html) to represent a simple computation (an SQL `COUNT` aggregate) for experimentation. About differential-dataflow from [GitHub](https://github.com/TimelyDataflow/differential-dataflow):
 
 >Differential dataflow is a data-parallel programming framework designed to efficiently process large volumes of data and to quickly respond to arbitrary changes in input collections. You can read more in the [differential dataflow mdbook](https://timelydataflow.github.io/differential-dataflow/) and in the [differential dataflow documentation](https://docs.rs/differential-dataflow/).
 
@@ -99,7 +99,7 @@ time curl -X POST 'http://localhost:8000/publish' \
 
 ## Wrap up
 
-Based on the experiment it seems like when doing two consequent identical computations with a change in input data, for 10 million records and aggregate `COUNT` Differential Dataflow introduces ~ `1sec` latency using a single worker. This means there is a possibility of significant performance gain if we’re able to re-write PartiQL queries as Differential Dataflow computations. Having said, during this project I faced the following issues with Differential Dataflow:
+Based on the experiment, it seems like when doing two consequent identical computations with a change in input data, for 10 million records and aggregate `COUNT`, Differential Dataflow introduces ~ `1sec` latency using a single worker. This means there is a possibility of significant performance gain if we’re able to re-write PartiQL queries as Differential Dataflow computations. Having said that, during this project I faced the following issues with Differential Dataflow:
 
 1. Distribute the load to multiple processors and workers is hard.
 2. We may only be able to re-write a subset of PartiQL queries as the Differential Dataflow library may not include all the features that PartiQL requires.
